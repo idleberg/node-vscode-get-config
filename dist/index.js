@@ -268,10 +268,10 @@ function substituteVariables(config) {
                     if (/\${env:\w+}/.test(configString)) {
                         configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
                     }
-                    if (/\${config:[\w\.]+}/.test(configString)) {
+                    if (/\${config:[\w.]+}/.test(configString)) {
                         configString = configString.replace(/(\${config:(\w+)})/g, process.env['$2']);
                     }
-                    if (!/\${command:[\w\.]+}/.test(configString)) return [3 /*break*/, 2];
+                    if (!/\${command:[\w.]+}/.test(configString)) return [3 /*break*/, 2];
                     _b = (_a = configString).replace;
                     _c = [/(\${command:(\w+)})/g];
                     return [4 /*yield*/, vscode.commands.getCommands()];

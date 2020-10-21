@@ -89,11 +89,11 @@ async function substituteVariables(config): Promise<unknown> {
     configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
   }
 
-  if (/\${config:[\w\.]+}/.test(configString)) {
+  if (/\${config:[\w.]+}/.test(configString)) {
     configString = configString.replace(/(\${config:(\w+)})/g, process.env['$2']);
   }
 
-  if (/\${command:[\w\.]+}/.test(configString)) {
+  if (/\${command:[\w.]+}/.test(configString)) {
     configString = configString.replace(/(\${command:(\w+)})/g, (await commands.getCommands())['$2']);
   }
 
