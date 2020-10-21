@@ -1,0 +1,46 @@
+{
+  "name": "vscode-get-config",
+  "version": "0.0.0",
+  "description": "A simple wrapper for `vscode.workspace.getConfiguration()` provided by the Visual Studio Code API",
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup --config",
+    "dev": "npm run start",
+    "fix": "eslint --fix ./src",
+    "lint": "eslint ./src",
+    "start": "rollup --watch --config"
+  },
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/idleberg/node-vscode-get-config.git"
+  },
+  "keywords": [
+    "vscode",
+    "vscode extension",
+    "vscode config",
+    "vscode settings"
+  ],
+  "dependencies": {
+    "dot-prop": "^6.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-typescript": "^5.0.2",
+    "@types/node": "^14.6.4",
+    "@types/vscode": "^1.48.0",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "@typescript-eslint/parser": "^4.0.1",
+    "eslint": "^7.8.1",
+    "husky": "^4.3.0",
+    "rollup": "^2.26.10",
+    "rollup-plugin-filesize": "^9.0.2",
+    "typescript": "^4.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  }
+}

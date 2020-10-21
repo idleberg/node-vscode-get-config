@@ -1,0 +1,14 @@
+# dependencies
+bower_components/
+node_modules/
+vendor/
+
+# package manager files
+npm-debug.log*
+yarn-error.log
+yarn.lock
+
+# project specific
+test.js
+test.ts
+todo.md
