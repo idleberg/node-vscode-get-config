@@ -25,47 +25,47 @@ async function getConfig(configNotation?: string): Promise<unknown> {
 async function substituteVariables(config): Promise<unknown> {
   let configString = JSON.stringify(config);
 
-  if (configString.includes('${workspaceFolder}')) {
+  if (configString?.includes('${workspaceFolder}')) {
     configString = configString.replace(/\${workspaceFolder}/g, getWorkspaceFolder());
   }
 
-  if (configString.includes('${workspaceFolderBasename}')) {
+  if (configString?.includes('${workspaceFolderBasename}')) {
     configString = configString.replace(/\${workspaceFolderBasename}/g, basename(getWorkspaceFolder()));
   }
 
-  if (configString.includes('${file}')) {
+  if (configString?.includes('${file}')) {
     configString = configString.replace(/\${file}/g, getFile());
   }
 
-  if (configString.includes('${relativeFile}')) {
+  if (configString?.includes('${relativeFile}')) {
     configString = configString.replace(/\${relativeFile}/g, getRelativeFile());
   }
 
-  if (configString.includes('${relativeFileDirname}')) {
+  if (configString?.includes('${relativeFileDirname}')) {
     configString = configString.replace(/\${relativeFileDirname}/g, getRelativeFileDirname());
   }
 
-  if (configString.includes('${fileBasename}')) {
+  if (configString?.includes('${fileBasename}')) {
     configString = configString.replace(/\${fileBasename}/g, getFileBasename());
   }
 
-  if (configString.includes('${fileBasenameNoExtension}')) {
+  if (configString?.includes('${fileBasenameNoExtension}')) {
     configString = configString.replace(/\${fileBasenameNoExtension}/g, getFileBasenameNoExtension());
   }
 
-  if (configString.includes('${fileDirname}')) {
+  if (configString?.includes('${fileDirname}')) {
     configString = configString.replace(/\${fileDirname}/g, getFileDirname());
   }
 
-  if (configString.includes('${fileExtname}')) {
+  if (configString?.includes('${fileExtname}')) {
     configString = configString.replace(/\${fileExtname}/g, getFileExtname());
   }
 
-  if (configString.includes('${cwd}')) {
+  if (configString?.includes('${cwd}')) {
     configString = configString.replace(/\${cwd}/g, process.cwd());
   }
 
-  if (configString.includes('${lineNumber}')) {
+  if (configString?.includes('${lineNumber}')) {
     const lineNumber = getLineNumber();
 
     if (lineNumber && parseInt(lineNumber)) {
@@ -73,7 +73,7 @@ async function substituteVariables(config): Promise<unknown> {
     }
   }
 
-  if (configString.includes('${selectedText}')) {
+  if (configString?.includes('${selectedText}')) {
     const selectedText = getSelection().join();
 
     if (selectedText) {
@@ -81,19 +81,19 @@ async function substituteVariables(config): Promise<unknown> {
     }
   }
 
-  if (configString.includes('${execPath}')) {
+  if (configString?.includes('${execPath}')) {
     configString = configString.replace(/\${execPath}/g, process.execPath);
   }
 
-  if (/\${env:\w+}/.test(configString)) {
+  if (configString && /\${env:\w+}/.test(configString)) {
     configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
   }
 
-  if (/\${config:[\w.]+}/.test(configString)) {
+  if (configString && /\${config:[\w.]+}/.test(configString)) {
     configString = configString.replace(/(\${config:(\w+)})/g, process.env['$2']);
   }
 
-  if (/\${command:[\w.]+}/.test(configString)) {
+  if (configString && /\${command:[\w.]+}/.test(configString)) {
     configString = configString.replace(/(\${command:(\w+)})/g, (await commands.getCommands())['$2']);
   }
 
@@ -122,9 +122,7 @@ function getRelativeFileDirname(): string {
 }
 
 function getFileBasename(): string {
-  const file = getFile();
-
-  return basename(file);
+  return basename(getFile());
 }
 
 function getFileBasenameNoExtension(): string {
@@ -132,15 +130,11 @@ function getFileBasenameNoExtension(): string {
 }
 
 function getFileDirname(): string {
-  const file = getFile();
-
-  return dirname(file);
+  return dirname(getFile());
 }
 
 function getFileExtname(): string {
-  const file = getFile();
-
-  return extname(file);
+  return extname(getFile());
 }
 
 function getLineNumber(): string {
