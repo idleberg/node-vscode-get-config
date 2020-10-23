@@ -220,65 +220,67 @@ function substituteVariables(config) {
             switch (_d.label) {
                 case 0:
                     configString = JSON.stringify(config);
-                    if (configString.includes('${workspaceFolder}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${workspaceFolder}')) {
                         configString = configString.replace(/\${workspaceFolder}/g, getWorkspaceFolder());
                     }
-                    if (configString.includes('${workspaceFolderBasename}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${workspaceFolderBasename}')) {
                         configString = configString.replace(/\${workspaceFolderBasename}/g, path.basename(getWorkspaceFolder()));
                     }
-                    if (configString.includes('${file}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${file}')) {
                         configString = configString.replace(/\${file}/g, getFile());
                     }
-                    if (configString.includes('${relativeFile}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${relativeFile}')) {
                         configString = configString.replace(/\${relativeFile}/g, getRelativeFile());
                     }
-                    if (configString.includes('${relativeFileDirname}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${relativeFileDirname}')) {
                         configString = configString.replace(/\${relativeFileDirname}/g, getRelativeFileDirname());
                     }
-                    if (configString.includes('${fileBasename}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${fileBasename}')) {
                         configString = configString.replace(/\${fileBasename}/g, getFileBasename());
                     }
-                    if (configString.includes('${fileBasenameNoExtension}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${fileBasenameNoExtension}')) {
                         configString = configString.replace(/\${fileBasenameNoExtension}/g, getFileBasenameNoExtension());
                     }
-                    if (configString.includes('${fileDirname}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${fileDirname}')) {
                         configString = configString.replace(/\${fileDirname}/g, getFileDirname());
                     }
-                    if (configString.includes('${fileExtname}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${fileExtname}')) {
                         configString = configString.replace(/\${fileExtname}/g, getFileExtname());
                     }
-                    if (configString.includes('${cwd}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${cwd}')) {
                         configString = configString.replace(/\${cwd}/g, process.cwd());
                     }
-                    if (configString.includes('${lineNumber}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${lineNumber}')) {
                         lineNumber = getLineNumber();
                         if (lineNumber && parseInt(lineNumber)) {
                             configString = configString.replace(/\${lineNumber}/g, getLineNumber());
                         }
                     }
-                    if (configString.includes('${selectedText}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${selectedText}')) {
                         selectedText = getSelection().join();
                         if (selectedText) {
                             configString = configString.replace(/\${selectedText}/g, selectedText);
                         }
                     }
-                    if (configString.includes('${execPath}')) {
+                    if (configString === null || configString === void 0 ? void 0 : configString.includes('${execPath}')) {
                         configString = configString.replace(/\${execPath}/g, process.execPath);
                     }
-                    if (/\${env:\w+}/.test(configString)) {
+                    if (configString && /\${env:\w+}/.test(configString)) {
                         configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
                     }
-                    if (/\${config:[\w.]+}/.test(configString)) {
+                    if (configString && /\${config:[\w.]+}/.test(configString)) {
                         configString = configString.replace(/(\${config:(\w+)})/g, process.env['$2']);
                     }
-                    if (!/\${command:[\w.]+}/.test(configString)) return [3 /*break*/, 2];
+                    if (!(configString && /\${command:[\w.]+}/.test(configString))) return [3 /*break*/, 2];
                     _b = (_a = configString).replace;
                     _c = [/(\${command:(\w+)})/g];
                     return [4 /*yield*/, vscode.commands.getCommands()];
                 case 1:
                     configString = _b.apply(_a, _c.concat([(_d.sent())['$2']]));
                     _d.label = 2;
-                case 2: return [2 /*return*/, JSON.parse(configString)];
+                case 2:
+                    console.log('fertig', configString);
+                    return [2 /*return*/, JSON.parse(configString)];
             }
         });
     });
@@ -299,19 +301,16 @@ function getRelativeFileDirname() {
     return path.dirname(getRelativeFile());
 }
 function getFileBasename() {
-    var file = getFile();
-    return path.basename(file);
+    return path.basename(getFile());
 }
 function getFileBasenameNoExtension() {
     return path.basename(getFile(), getFileExtname());
 }
 function getFileDirname() {
-    var file = getFile();
-    return path.dirname(file);
+    return path.dirname(getFile());
 }
 function getFileExtname() {
-    var file = getFile();
-    return path.extname(file);
+    return path.extname(getFile());
 }
 function getLineNumber() {
     var editor = vscode.window.activeTextEditor;
