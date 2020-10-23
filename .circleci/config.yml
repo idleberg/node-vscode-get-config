@@ -15,7 +15,7 @@ commands:
             - ./node_modules
       - run:
           name: Lint source
-          command: npm lint
+          command: npm run lint
 
 jobs:
   node-latest:
