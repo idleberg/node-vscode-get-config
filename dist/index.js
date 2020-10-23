@@ -201,14 +201,21 @@ var dotProp = {
 
 function getConfig(configNotation) {
     return __awaiter(this, void 0, void 0, function () {
-        var config;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var config, _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     config = (configNotation === null || configNotation === void 0 ? void 0 : configNotation.length) ? dotProp.get(vscode.workspace.getConfiguration(), configNotation)
                         : vscode.workspace.getConfiguration();
+                    if (!Object.keys(config).length) return [3 /*break*/, 2];
                     return [4 /*yield*/, substituteVariables(config)];
-                case 1: return [2 /*return*/, _a.sent()];
+                case 1:
+                    _a = _b.sent();
+                    return [3 /*break*/, 3];
+                case 2:
+                    _a = config;
+                    _b.label = 3;
+                case 3: return [2 /*return*/, _a];
             }
         });
     });
@@ -278,9 +285,7 @@ function substituteVariables(config) {
                 case 1:
                     configString = _b.apply(_a, _c.concat([(_d.sent())['$2']]));
                     _d.label = 2;
-                case 2:
-                    console.log('fertig', configString);
-                    return [2 /*return*/, JSON.parse(configString)];
+                case 2: return [2 /*return*/, JSON.parse(configString)];
             }
         });
     });

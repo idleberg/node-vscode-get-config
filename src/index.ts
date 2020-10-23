@@ -19,7 +19,9 @@ async function getConfig(configNotation?: string): Promise<unknown> {
     ? dotProp.get(workspace.getConfiguration(), configNotation)
     : workspace.getConfiguration();
 
-  return await substituteVariables(config);
+  return Object.keys(config).length
+    ? await substituteVariables(config)
+    : config;
 }
 
 async function substituteVariables(config): Promise<unknown> {
