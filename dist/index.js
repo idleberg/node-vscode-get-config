@@ -293,6 +293,9 @@ function substituteVariables(config) {
                     if (configString === null || configString === void 0 ? void 0 : configString.includes('${execPath}')) {
                         configString = configString.replace(/\${execPath}/g, process.execPath);
                     }
+                    if (configString && /\${workspaceFolder:[\w./\\]+}/.test(configString)) {
+                        configString = configString.replace(/(\${workspaceFolder:(\w+)})/g, getWorkspaceFolder('$2'));
+                    }
                     if (configString && /\${env:\w+}/.test(configString)) {
                         configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
                     }
@@ -351,8 +354,9 @@ function getSelection() {
         return vscode.window.activeTextEditor.document.getText(new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character));
     });
 }
-function getWorkspaceFolder() {
+function getWorkspaceFolder(appendPath) {
     var _a, _b;
+    if (appendPath === void 0) { appendPath = ''; }
     var editor = vscode.window.activeTextEditor;
     if (!editor) {
         vscode.window.showWarningMessage('No open editors');
@@ -363,7 +367,8 @@ function getWorkspaceFolder() {
         vscode.window.showWarningMessage('No open workspaces');
         return;
     }
-    return uri.fsPath;
+    return (appendPath === null || appendPath === void 0 ? void 0 : appendPath.length) ? path.join(uri.fsPath, appendPath)
+        : uri.fsPath;
 }
 
 exports.getConfig = getConfig;

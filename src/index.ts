@@ -9,6 +9,7 @@ import {
   basename,
   dirname,
   extname,
+  join,
   relative
 } from 'path';
 
@@ -100,6 +101,10 @@ async function substituteVariables(config): Promise<unknown> {
     configString = configString.replace(/\${execPath}/g, process.execPath);
   }
 
+  if (configString && /\${workspaceFolder:[\w./\\]+}/.test(configString)) {
+    configString = configString.replace(/(\${workspaceFolder:(\w+)})/g, getWorkspaceFolder('$2'));
+  }
+
   if (configString && /\${env:\w+}/.test(configString)) {
     configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
   }
@@ -169,7 +174,7 @@ function getSelection(): string[] {
   });
 }
 
-function getWorkspaceFolder(): null | string {
+function getWorkspaceFolder(appendPath = ''): null | string {
   const editor = window.activeTextEditor;
 
   if (!editor) {
@@ -184,7 +189,9 @@ function getWorkspaceFolder(): null | string {
     return;
   }
 
-  return uri.fsPath;
+  return appendPath?.length
+    ? join(uri.fsPath, appendPath)
+    : uri.fsPath;
 }
 
 export {
