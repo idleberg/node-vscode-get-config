@@ -31,7 +31,6 @@ import { getConfig } from 'vscode-get-config';
 
 const { fontFamily, fontSize } = await getConfig('editor');
 const fontConfig = await getConfig('editor.fontFamily', 'editor.fontSize');
-await getConfig('editor.minimap.enabled');
 ```
 
 ### Variable Substitution
