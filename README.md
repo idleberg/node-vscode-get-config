@@ -38,7 +38,22 @@ await getConfig('editor.minimap.enabled');
 
 Most of Visual Studio Code's [ variables](https://code.visualstudio.com/docs/editor/variables-reference) will be substituted used in a configuration value
 
-- all predefined variables excluding `${defaultBuildTask}`, `${workspaceFolder:Client}` and `${workspaceFolder:Server}`
+- all predefined variables
+    - `${workspaceFolder}`
+    - `${workspaceFolderBasename}`
+    - `${file}`
+    - `${relativeFile}`
+    - `${relativeFileDirname}`
+    - `${fileBasename}`
+    - `${fileBasenameNoExtension}`
+    - `${fileDirname}`
+    - `${fileExtname}`
+    - `${cwd}`
+    - `${lineNumber}`
+    - `${selectedText}`
+    - `${execPath}`
+    - <strike>`${defaultBuildTask}`</strike>
+
 - environment variables, e.g. `${env:USERNAME}`
 - configuration variables, e.g. `${config:editor.fontSize}`
 - command variables, e.g. `${command:extension.pickNodeProces}`
