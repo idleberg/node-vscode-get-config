@@ -27,10 +27,11 @@ getConfig(section?: string)
 **Example:**
 
 ```js
-const { getConfig } = require('vscode-get-config');
+import { getConfig } from 'vscode-get-config';
 
-getConfig('editor');
-getConfig('editor.minimap.enabled');
+const { fontFamily, fontSize } = await getConfig('editor');
+const fontConfig = await getConfig('editor.fontFamily', 'editor.fontSize');
+await getConfig('editor.minimap.enabled');
 ```
 
 ### Variable Substitution
