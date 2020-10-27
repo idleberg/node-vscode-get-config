@@ -14,12 +14,25 @@ import {
 
 import dotProp from 'dot-prop';
 
-async function getConfig(configNotation?: string): Promise<unknown> {
+async function getConfig(...configNotations: string[]): Promise<unknown> {
+  switch (true) {
+    case configNotations.length === 0:
+      return workspace.getConfiguration();
+
+    case configNotations.length === 1:
+      return getSingleConfig(configNotations[0]);
+
+    default:
+      return Promise.all(configNotations.map(async configNotation => getSingleConfig(configNotation)));
+  }
+}
+
+async function getSingleConfig(configNotation?: string): Promise<unknown> {
   const config = configNotation?.length
     ? dotProp.get(workspace.getConfiguration(), configNotation)
     : workspace.getConfiguration();
 
-  return Object.keys(config).length
+  return config && Object.keys(config).length
     ? await substituteVariables(config)
     : config;
 }

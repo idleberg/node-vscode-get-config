@@ -199,7 +199,28 @@ var dotProp = {
 	}
 };
 
-function getConfig(configNotation) {
+function getConfig() {
+    var configNotations = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        configNotations[_i] = arguments[_i];
+    }
+    return __awaiter(this, void 0, void 0, function () {
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (true) {
+                case configNotations.length === 0:
+                    return [2 /*return*/, vscode.workspace.getConfiguration()];
+                case configNotations.length === 1:
+                    return [2 /*return*/, getSingleConfig(configNotations[0])];
+                default:
+                    return [2 /*return*/, Promise.all(configNotations.map(function (configNotation) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
+                            return [2 /*return*/, getSingleConfig(configNotation)];
+                        }); }); }))];
+            }
+        });
+    });
+}
+function getSingleConfig(configNotation) {
     return __awaiter(this, void 0, void 0, function () {
         var config, _a;
         return __generator(this, function (_b) {
@@ -207,7 +228,7 @@ function getConfig(configNotation) {
                 case 0:
                     config = (configNotation === null || configNotation === void 0 ? void 0 : configNotation.length) ? dotProp.get(vscode.workspace.getConfiguration(), configNotation)
                         : vscode.workspace.getConfiguration();
-                    if (!Object.keys(config).length) return [3 /*break*/, 2];
+                    if (!(config && Object.keys(config).length)) return [3 /*break*/, 2];
                     return [4 /*yield*/, substituteVariables(config)];
                 case 1:
                     _a = _b.sent();
