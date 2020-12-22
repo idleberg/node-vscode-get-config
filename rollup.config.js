@@ -12,7 +12,10 @@ const defaults = {
     filesize(),
     nodeResolve(),
     typescript({
-      allowSyntheticDefaultImports: true
+      allowSyntheticDefaultImports: true,
+      lib: [
+        'esnext.string',
+      ]
     })
   ]
 };
@@ -20,6 +23,10 @@ const defaults = {
 export default [
   {
     ...defaults,
+    external: [
+      'path',
+      'vscode'
+    ],
     input: 'src/index.ts',
     output: {
       file: 'dist/index.js',
