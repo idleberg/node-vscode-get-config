@@ -14,7 +14,7 @@ const defaults = {
     typescript({
       allowSyntheticDefaultImports: true,
       lib: [
-        'esnext.string',
+        'esnext',
       ]
     })
   ]
