@@ -3,7 +3,8 @@ bower_components/
 node_modules/
 vendor/
 
-# package manager files
+# development
+.eslintcache
 npm-debug.log*
 yarn-error.log
 yarn.lock
