@@ -1,16 +1,14 @@
-import {
-  commands,
-  Range,
-  window,
-  workspace
-} from 'vscode';
+import 'core-js/modules/es.string.replace-all';
+
+import vscode from 'vscode';
 
 import {
   basename,
   dirname,
   extname,
   join,
-  relative
+  relative,
+  sep
 } from 'path';
 
 import dotProp from 'dot-prop';
@@ -18,7 +16,7 @@ import dotProp from 'dot-prop';
 async function getConfig(...configNotations: string[]): Promise<unknown> {
   switch (true) {
     case configNotations.length === 0:
-      return workspace.getConfiguration();
+      return vscode.workspace.getConfiguration();
 
     case configNotations.length === 1:
       return getSingleConfig(configNotations[0]);
@@ -30,8 +28,8 @@ async function getConfig(...configNotations: string[]): Promise<unknown> {
 
 async function getSingleConfig(configNotation?: string): Promise<unknown> {
   const config = configNotation?.length
-    ? dotProp.get(workspace.getConfiguration(), configNotation)
-    : workspace.getConfiguration();
+    ? dotProp.get(vscode.workspace.getConfiguration(), configNotation)
+    : vscode.workspace.getConfiguration();
 
   return config && Object.keys(config).length
     ? await substituteVariables(config)
@@ -101,30 +99,59 @@ async function substituteVariables(config): Promise<unknown> {
     configString = configString.replace(/\${execPath}/g, process.execPath);
   }
 
-  if (configString && /\${workspaceFolder:[\w./\\]+}/.test(configString)) {
-    configString = configString.replace(/(\${workspaceFolder:(\w+)})/g, getWorkspaceFolder('$2'));
+  if (configString?.includes('${pathSeparator}')) {
+    configString = configString.replace(/\${pathSeparator}/g, sep);
   }
 
-  if (configString && /\${env:\w+}/.test(configString)) {
-    configString = configString.replace(/(\${env:(\w+)})/g, process.env['$2']);
+  if (configString && /\${workspaceFolder:[^}]+}/.test(configString)) {
+    const { workspaceFolders } = vscode.workspace;
+
+    const regex = /\${workspaceFolder:(?<name>[^}]+)}/g;
+    const matches = configString.match(regex);
+
+    if (matches?.length) {
+      matches.map(item => {
+
+          const { groups } = item.match(/\${workspaceFolder:(?<name>[^}]+)\}/);
+          if (groups.name) {
+            const found = workspaceFolders.find(item => item.name === groups.name)
+
+            if (found) {
+              configString = configString.replaceAll(`\${workspaceFolder:${groups.name}}`, found.uri.fsPath);
+            }
+          }
+
+        })
+    }
   }
 
-  if (configString && /\${config:[\w.]+}/.test(configString)) {
-    configString = configString.replace(/(\${config:(\w+)})/g, process.env['$2']);
+  if (configString && /\${env:[^}]+}/.test(configString)) {
+    const { groups } = configString.match(/\${env:(?<name>[^}]+)\}/);
+
+    if (groups?.name && process.env[groups.name]) {
+      configString = configString.replace(/(\${env:[^}]+})/g, process.env[groups.name]);
+    }
   }
 
-  if (configString && /\${command:[\w.]+}/.test(configString)) {
-    configString = configString.replace(/(\${command:(\w+)})/g, (await commands.getCommands())['$2']);
+  if (configString && /\${config:[^}]+}/.test(configString)) {
+    const { groups } = configString.match(/\${config:(?<name>[^}]+)\}/);
+    const configuration = vscode.workspace.getConfiguration();
+
+    if (groups?.name && dotProp.get(configuration, groups.name)) {
+      const pick = String(dotProp.get(configuration, groups.name));
+
+      configString = configString.replace(/(\${config:[^}]+})/g, pick);
+    }
   }
 
   return JSON.parse(configString);
 }
 
 function getFile(): string {
-  const editor = window.activeTextEditor;
+  const editor = vscode.window.activeTextEditor;
 
   if (!editor) {
-    window.showWarningMessage('No open editors');
+    vscode.window.showWarningMessage('No open editors');
     return;
   }
 
@@ -158,10 +185,10 @@ function getFileExtname(): string {
 }
 
 function getLineNumber(): string {
-  const editor = window.activeTextEditor;
+  const editor = vscode.window.activeTextEditor;
 
   if (!editor) {
-    window.showWarningMessage('No open editors');
+    vscode.window.showWarningMessage('No open editors');
     return;
   }
 
@@ -169,23 +196,23 @@ function getLineNumber(): string {
 }
 
 function getSelection(): string[] {
-  return window.activeTextEditor.selections.map((selection) => {
-    return window.activeTextEditor.document.getText(new Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character));
+  return vscode.window.activeTextEditor.selections.map((selection) => {
+    return vscode.window.activeTextEditor.document.getText(new vscode.Range(selection.start.line, selection.start.character, selection.end.line, selection.end.character));
   });
 }
 
 function getWorkspaceFolder(appendPath = ''): null | string {
-  const editor = window.activeTextEditor;
+  const editor = vscode.window.activeTextEditor;
 
   if (!editor) {
-    window.showWarningMessage('No open editors');
+    vscode.window.showWarningMessage('No open editors');
     return;
   }
 
-  const { uri } = workspace.getWorkspaceFolder(editor?.document?.uri);
+  const { uri } = vscode.workspace.getWorkspaceFolder(editor?.document?.uri);
 
   if (!uri.fsPath?.length) {
-    window.showWarningMessage('No open workspaces');
+    vscode.window.showWarningMessage('No open workspaces');
     return;
   }
 
