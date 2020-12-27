@@ -25,6 +25,7 @@ export default [
     ...defaults,
     external: [
       'path',
+      'process',
       'vscode'
     ],
     input: 'src/index.ts',
