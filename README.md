@@ -51,11 +51,11 @@ Most of Visual Studio Code's [ variables](https://code.visualstudio.com/docs/edi
     - `${lineNumber}`
     - `${selectedText}`
     - `${execPath}`
+    - `${pathSeparator}`
     - <strike>`${defaultBuildTask}`</strike>
 
 - environment variables, e.g. `${env:USERNAME}`
-- configuration variables, e.g. `${config:editor.fontSize}`
-- command variables, e.g. `${command:extension.pickNodeProces}`
+- configuration variables, e.g. `${config:editor.fontSize}` 
 
 ## License
 
