@@ -57,4 +57,4 @@ Most of Visual Studio Code's [ variables](https://code.visualstudio.com/docs/edi
 
 ## License
 
-This work is licensed under [The MIT License](https://opensource.org/licenses/MIT).
+This work is licensed under [The MIT License](LICENSE).
