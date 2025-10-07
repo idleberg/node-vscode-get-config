@@ -1,8 +1,8 @@
 # vscode-get-config
 
-[![License](https://img.shields.io/github/license/idleberg/vscode-get-config?color=blue&style=for-the-badge)](https://github.com/idleberg/vscode-get-config/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/idleberg/node-vscode-get-config?color=blue&style=for-the-badge)](https://github.com/idleberg/node-vscode-get-config/blob/main/LICENSE)
 [![Version: npm](https://img.shields.io/npm/v/vscode-get-config?style=for-the-badge)](https://www.npmjs.org/package/vscode-get-config)
-![GitHub branch check runs](https://img.shields.io/github/check-runs/idleberg/vscode-get-config/main?style=for-the-badge)
+![GitHub branch check runs](https://img.shields.io/github/check-runs/idleberg/node-vscode-get-config/main?style=for-the-badge)
 
 A simple wrapper for `vscode.workspace.getConfiguration()` provided by the Visual Studio Code API
 
