@@ -5,5 +5,5 @@
 	},
 	"editor.formatOnPaste": true,
 	"editor.formatOnSave": true,
-		"editor.defaultFormatter": "biomejs.biome"
+	"editor.defaultFormatter": "biomejs.biome"
 }

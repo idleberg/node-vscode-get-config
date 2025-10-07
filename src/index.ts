@@ -1,7 +1,6 @@
-import * as dotProp from "dot-prop";
-
-import { basename, dirname, extname, join, relative, sep } from "path";
-import * as vscode from "vscode";
+import { basename, dirname, extname, join, relative, sep } from 'node:path';
+import * as dotProp from 'dot-prop';
+import * as vscode from 'vscode';
 
 // Pre-compiled regex patterns for better performance
 const REGEX_PATTERNS = {
@@ -46,6 +45,7 @@ const cache = new Map<string, string | undefined>();
 
 function getCached<T>(key: string, fn: () => T): T {
 	if (!cache.has(key)) {
+		// biome-ignore lint/suspicious/noExplicitAny: tbd
 		cache.set(key, fn() as any);
 	}
 	return cache.get(key) as T;
@@ -56,31 +56,29 @@ vscode.window.onDidChangeActiveTextEditor(() => {
 	cache.clear();
 });
 
-export async function getConfig<T = vscode.WorkspaceConfiguration>(
-	configNotation?: string
-): Promise<T> {
+export async function getConfig<T = vscode.WorkspaceConfiguration>(configNotation?: string): Promise<T> {
 	const config = configNotation?.length
 		? dotProp.getProperty(vscode.workspace.getConfiguration(), configNotation)
 		: vscode.workspace.getConfiguration();
 
-	return config && Object.keys(config).length
-		? ((await substituteVariables(config)) as T)
-		: (config as T);
+	return config && Object.keys(config).length ? ((await substituteVariables(config)) as T) : (config as T);
 }
 
-async function substituteVariables(config: any): Promise<unknown> {
+async function substituteVariables(config: vscode.WorkspaceConfiguration): Promise<unknown> {
 	let configString = JSON.stringify(config);
 
 	// Define all variable replacements with their resolvers
 	const replacements: VariableReplacement[] = [
 		{
 			pattern: REGEX_PATTERNS.workspaceFolder,
-			testString: "${workspaceFolder}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${workspaceFolder}',
 			resolver: getWorkspaceFolder,
 		},
 		{
 			pattern: REGEX_PATTERNS.workspaceFolderBasename,
-			testString: "${workspaceFolderBasename}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${workspaceFolderBasename}',
 			resolver: () => {
 				const folder = getWorkspaceFolder();
 				return folder ? basename(folder) : undefined;
@@ -88,53 +86,63 @@ async function substituteVariables(config: any): Promise<unknown> {
 		},
 		{
 			pattern: REGEX_PATTERNS.file,
-			testString: "${file}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${file}',
 			resolver: getFile,
 		},
 		{
 			pattern: REGEX_PATTERNS.relativeFile,
-			testString: "${relativeFile}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${relativeFile}',
 			resolver: getRelativeFile,
 		},
 		{
 			pattern: REGEX_PATTERNS.relativeFileDirname,
-			testString: "${relativeFileDirname}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${relativeFileDirname}',
 			resolver: getRelativeFileDirname,
 		},
 		{
 			pattern: REGEX_PATTERNS.fileBasename,
-			testString: "${fileBasename}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${fileBasename}',
 			resolver: getFileBasename,
 		},
 		{
 			pattern: REGEX_PATTERNS.fileBasenameNoExtension,
-			testString: "${fileBasenameNoExtension}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${fileBasenameNoExtension}',
 			resolver: getFileBasenameNoExtension,
 		},
 		{
 			pattern: REGEX_PATTERNS.fileDirname,
-			testString: "${fileDirname}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${fileDirname}',
 			resolver: getFileDirname,
 		},
 		{
 			pattern: REGEX_PATTERNS.fileExtname,
-			testString: "${fileExtname}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${fileExtname}',
 			resolver: getFileExtname,
 		},
 		{
 			pattern: REGEX_PATTERNS.cwd,
-			testString: "${cwd}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${cwd}',
 			resolver: () => process.cwd(),
 		},
 		{
 			pattern: REGEX_PATTERNS.lineNumber,
-			testString: "${lineNumber}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${lineNumber}',
 			resolver: getLineNumber,
 			requiresValidation: true,
 		},
 		{
 			pattern: REGEX_PATTERNS.selectedText,
-			testString: "${selectedText}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${selectedText}',
 			resolver: () => {
 				const selection = getSelection().join();
 				return selection || undefined;
@@ -142,28 +150,27 @@ async function substituteVariables(config: any): Promise<unknown> {
 		},
 		{
 			pattern: REGEX_PATTERNS.execPath,
-			testString: "${execPath}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${execPath}',
 			resolver: () => process.execPath,
 		},
 		{
 			pattern: REGEX_PATTERNS.pathSeparator,
-			testString: "${pathSeparator}",
+			// biome-ignore lint/suspicious/noTemplateCurlyInString: Allowed placeholder syntax
+			testString: '${pathSeparator}',
 			resolver: () => sep,
 		},
 	];
 
 	// Process simple replacements
 	for (const replacement of replacements) {
-		if (
-			replacement.testString &&
-			!configString.includes(replacement.testString)
-		) {
+		if (replacement.testString && !configString.includes(replacement.testString)) {
 			continue; // Skip if pattern not present
 		}
 
 		const value = replacement.resolver();
 		if (value !== undefined) {
-			if (replacement.requiresValidation && !parseInt(value)) {
+			if (replacement.requiresValidation && !Number.parseInt(value, 10)) {
 				continue; // Skip invalid line numbers
 			}
 			configString = configString.replace(replacement.pattern, value);
@@ -204,9 +211,7 @@ function replaceNamedWorkspaceFolders(configString: string): string {
 
 		const nameMatch = match.match(/\${workspaceFolder:(?<name>[^}]+)}/);
 		if (nameMatch?.groups?.name) {
-			const found = workspaceFolders.find(
-				(folder) => folder.name === nameMatch.groups!.name
-			);
+			const found = workspaceFolders.find((folder) => folder.name === nameMatch.groups?.name);
 			if (found) {
 				result = result.replaceAll(match, found.uri.fsPath);
 			}
@@ -248,64 +253,58 @@ function replaceConfigVariables(configString: string): string {
 }
 
 function getFile(): string | undefined {
-	return getCached("file", () => {
+	return getCached('file', () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
-			vscode.window.showWarningMessage("No open editors");
+			vscode.window.showWarningMessage('No open editors');
 			return undefined;
 		}
 		return editor.document.uri.fsPath;
 	});
 }
 
-function getWorkspaceFolder(appendPath: string = ""): string | undefined {
+function getWorkspaceFolder(appendPath = ''): string | undefined {
 	return getCached(`workspaceFolder:${appendPath}`, () => {
 		const editor = vscode.window.activeTextEditor;
 		if (!editor) {
-			vscode.window.showWarningMessage("No open editors");
+			vscode.window.showWarningMessage('No open editors');
 			return undefined;
 		}
 
-		const workspaceFolder = vscode.workspace.getWorkspaceFolder(
-			editor.document.uri
-		);
+		const workspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
 		if (!workspaceFolder?.uri.fsPath?.length) {
-			vscode.window.showWarningMessage("No open workspaces");
+			vscode.window.showWarningMessage('No open workspaces');
 			return undefined;
 		}
 
-		return appendPath?.length
-			? join(workspaceFolder.uri.fsPath, appendPath)
-			: workspaceFolder.uri.fsPath;
+		return appendPath?.length ? join(workspaceFolder.uri.fsPath, appendPath) : workspaceFolder.uri.fsPath;
 	});
 }
 
 function getRelativeFile(): string | undefined {
-	return getCached("relativeFile", () => {
+	return getCached('relativeFile', () => {
 		const workspaceFolder = getWorkspaceFolder();
 		const file = getFile();
-		return workspaceFolder && file
-			? relative(workspaceFolder, file)
-			: undefined;
+		return workspaceFolder && file ? relative(workspaceFolder, file) : undefined;
 	});
 }
 
 function getRelativeFileDirname(): string | undefined {
-	return getCached("relativeFileDirname", () => {
+	return getCached('relativeFileDirname', () => {
 		const relativeFile = getRelativeFile();
 		return relativeFile ? dirname(relativeFile) : undefined;
 	});
 }
 
 function getFileBasename(): string | undefined {
-	return getCached("fileBasename", () => {
+	return getCached('fileBasename', () => {
 		const file = getFile();
 		return file ? basename(file) : undefined;
 	});
 }
 
 function getFileBasenameNoExtension(): string | undefined {
-	return getCached("fileBasenameNoExtension", () => {
+	return getCached('fileBasenameNoExtension', () => {
 		const file = getFile();
 		if (!file) return undefined;
 		const ext = getFileExtname();
@@ -314,14 +313,14 @@ function getFileBasenameNoExtension(): string | undefined {
 }
 
 function getFileDirname(): string | undefined {
-	return getCached("fileDirname", () => {
+	return getCached('fileDirname', () => {
 		const file = getFile();
 		return file ? dirname(file) : undefined;
 	});
 }
 
 function getFileExtname(): string | undefined {
-	return getCached("fileExtname", () => {
+	return getCached('fileExtname', () => {
 		const file = getFile();
 		return file ? extname(file) : undefined;
 	});
@@ -331,7 +330,7 @@ function getLineNumber(): string | undefined {
 	// Don't cache line number as it changes frequently
 	const editor = vscode.window.activeTextEditor;
 	if (!editor) {
-		vscode.window.showWarningMessage("No open editors");
+		vscode.window.showWarningMessage('No open editors');
 		return undefined;
 	}
 	return String(editor.selection.active.line + 1);
@@ -347,9 +346,9 @@ function getSelection(): string[] {
 						selection.start.line,
 						selection.start.character,
 						selection.end.line,
-						selection.end.character
-					)
+						selection.end.character,
+					),
 				);
-		  })
+			})
 		: [];
 }
