@@ -57,11 +57,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --strict-peer-dependencies
 
-      - name: Lint Source
-        run: pnpm run --if-present lint
-
+        # lint expects dist folder, so we need to build first
       - name: Build Source
         run: pnpm run --if-present build
+
+      - name: Lint Source
+        run: pnpm run --if-present lint
 
       - name: Run Tests
         run: pnpm run --if-present test
