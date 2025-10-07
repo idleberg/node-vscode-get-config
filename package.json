@@ -1,57 +1,56 @@
 {
-  "name": "vscode-get-config",
-  "version": "0.4.0",
-  "description": "A simple wrapper for `vscode.workspace.getConfiguration()` provided by the Visual Studio Code API",
-  "license": "MIT",
-  "scripts": {
-    "build": "rollup --config",
-    "dev": "npm run start",
-    "fix": "eslint --fix ./src",
-    "lint:json": "jsonlint --quiet ./*.json",
-    "lint:ts": "eslint ./src",
-    "lint": "npm-run-all --parallel lint:*",
-    "start": "rollup --watch --config"
-  },
-  "main": "dist/index.js",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/idleberg/node-vscode-get-config.git"
-  },
-  "keywords": [
-    "vscode",
-    "vscode extension",
-    "vscode config",
-    "vscode settings"
-  ],
-  "dependencies": {
-    "core-js": "^3.8.1",
-    "dot-prop": "^6.0.1"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^17.0.0",
-    "@rollup/plugin-node-resolve": "^11.0.1",
-    "@rollup/plugin-typescript": "^8.1.0",
-    "@types/node": "^14.14.14",
-    "@types/vscode": "^1.52.0",
-    "@typescript-eslint/eslint-plugin": "^4.11.0",
-    "@typescript-eslint/parser": "^4.11.0",
-    "eslint": "^7.16.0",
-    "husky": "^4.3.6",
-    "jsonlint": "^1.6.3",
-    "lint-staged": ">=10",
-    "npm-run-all": "^4.1.5",
-    "rollup": "^2.35.1",
-    "rollup-plugin-filesize": "^9.1.0",
-    "tslib": "^2.0.3",
-    "typescript": "^4.1.3"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.json": "jsonlint --quiet",
-    "*.{js,ts}": "eslint --cache --fix"
-  }
+	"name": "vscode-get-config",
+	"version": "0.4.0",
+	"description": "A simple wrapper for `vscode.workspace.getConfiguration()` provided by the Visual Studio Code API",
+	"license": "MIT",
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"lint": "biome check",
+		"prepack": "npm run build",
+		"prepare": "lefthook install",
+		"publish:npm": "np --package-manager pnpm --any-branch",
+		"test": "vitest",
+		"test:coverage": "vitest --coverage"
+	},
+	"type": "module",
+	"exports": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"engines": {
+		"node": "^18.0.0 || ^20.0.0 || >=22.0.0"
+	},
+	"files": [
+		"dist/",
+		"LICENSE",
+		"README.md"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/idleberg/node-vscode-get-config.git"
+	},
+	"keywords": [
+		"vscode",
+		"vscode extension",
+		"vscode config",
+		"vscode settings"
+	],
+	"dependencies": {
+		"dot-prop": "^10.1.0"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^20.1.0",
+		"@commitlint/config-conventional": "^20.0.0",
+		"@idleberg/configs": "^0.3.1",
+		"@total-typescript/tsconfig": "^1.0.4",
+		"@types/node": "^24.7.0",
+		"@types/vscode": "^1.104.0",
+		"@vitest/coverage-v8": "^3.2.4",
+		"@vitest/ui": "^3.2.4",
+		"concurrently": "^9.2.1",
+		"jsonlint": "^1.6.3",
+		"tsdown": "^0.15.6",
+		"tslib": "^2.0.3",
+		"typescript": "^5.9.3",
+		"vitest": "^3.2.4"
+	}
 }

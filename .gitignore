@@ -9,6 +9,13 @@ npm-debug.log*
 yarn-error.log
 yarn.lock
 
+# build
+dist/
+
+# testing
+coverage/
+__screenshots__/
+
 # project specific
 test.js
 test.ts
