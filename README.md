@@ -50,7 +50,7 @@ Most of Visual Studio Code's [ variables](https://code.visualstudio.com/docs/edi
     - `${selectedText}`
     - `${execPath}`
     - `${pathSeparator}`
-    - <strike>`${defaultBuildTask}`</strike>
+    - ~~`${defaultBuildTask}`~~
 
 - environment variables, e.g. `${env:USERNAME}`
 - configuration variables, e.g. `${config:editor.fontSize}` 
