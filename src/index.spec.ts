@@ -33,7 +33,7 @@ vi.mock('vscode', () => ({
 }));
 
 // Import after mocking
-const { getConfig } = await import('./index');
+const { getConfig } = await import('./index.ts');
 
 describe('getConfig', () => {
 	beforeEach(() => {
@@ -52,7 +52,7 @@ describe('getConfig', () => {
 	});
 
 	describe('basic configuration retrieval', () => {
-		it('should return full configuration when no notation provided', async () => {
+		it('should return full configuration when no notation provided', () => {
 			const mockConfig = {
 				editor: { fontSize: 14 },
 				terminal: { shell: '/bin/bash' },
@@ -60,18 +60,18 @@ describe('getConfig', () => {
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual(mockConfig);
 		});
 
-		it('should return empty configuration when config is empty', async () => {
+		it('should return empty configuration when config is empty', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue({} as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({});
 		});
 
-		it('should return specific config section using dot notation', async () => {
+		it('should return specific config section using dot notation', () => {
 			const mockConfig = {
 				editor: {
 					fontSize: 14,
@@ -81,11 +81,11 @@ describe('getConfig', () => {
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig('editor.fontSize');
+			const result = getConfig('editor.fontSize');
 			expect(result).toBe(14);
 		});
 
-		it('should return nested config using dot notation', async () => {
+		it('should return nested config using dot notation', () => {
 			const mockConfig = {
 				editor: {
 					minimap: {
@@ -96,7 +96,7 @@ describe('getConfig', () => {
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig('editor.minimap');
+			const result = getConfig('editor.minimap');
 			expect(result).toEqual({ enabled: true });
 		});
 	});
@@ -106,7 +106,7 @@ describe('getConfig', () => {
 			if (clearCacheCallback) clearCacheCallback();
 		});
 
-		it('should substitute ${workspaceFolder} variable', async () => {
+		it('should substitute ${workspaceFolder} variable', () => {
 			const mockConfig = {
 				path: '${workspaceFolder}/src',
 			};
@@ -131,13 +131,13 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(mockWorkspaceFolder as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '/workspace/project/src',
 			});
 		});
 
-		it('should substitute ${workspaceFolderBasename} variable', async () => {
+		it('should substitute ${workspaceFolderBasename} variable', () => {
 			const mockConfig = {
 				name: '${workspaceFolderBasename}',
 			};
@@ -162,13 +162,13 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(mockWorkspaceFolder as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				name: 'my-project',
 			});
 		});
 
-		it('should substitute ${workspaceFolder:name} for named workspace', async () => {
+		it('should substitute ${workspaceFolder:name} for named workspace', () => {
 			const mockConfig = {
 				path: '${workspaceFolder:backend}/api',
 			};
@@ -189,13 +189,13 @@ describe('getConfig', () => {
 			(vscode.workspace as any).workspaceFolders = mockWorkspaceFolders;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '/workspace/backend/api',
 			});
 		});
 
-		it('should not substitute ${workspaceFolder:name} when workspace not found', async () => {
+		it('should not substitute ${workspaceFolder:name} when workspace not found', () => {
 			const mockConfig = {
 				path: '${workspaceFolder:nonexistent}/api',
 			};
@@ -211,13 +211,13 @@ describe('getConfig', () => {
 			(vscode.workspace as any).workspaceFolders = mockWorkspaceFolders;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '${workspaceFolder:nonexistent}/api',
 			});
 		});
 
-		it('should handle multiple named workspace folder substitutions', async () => {
+		it('should handle multiple named workspace folder substitutions', () => {
 			const mockConfig = {
 				paths: [
 					'${workspaceFolder:frontend}/src',
@@ -242,7 +242,7 @@ describe('getConfig', () => {
 			(vscode.workspace as any).workspaceFolders = mockWorkspaceFolders;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				paths: ['/workspace/frontend/src', '/workspace/backend/api', '/workspace/frontend/tests'],
 			});
@@ -254,7 +254,7 @@ describe('getConfig', () => {
 			if (clearCacheCallback) clearCacheCallback();
 		});
 
-		it('should substitute ${file} variable', async () => {
+		it('should substitute ${file} variable', () => {
 			const mockConfig = {
 				current: '${file}',
 			};
@@ -270,13 +270,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				current: '/workspace/project/src/index.ts',
 			});
 		});
 
-		it('should substitute ${relativeFile} variable', async () => {
+		it('should substitute ${relativeFile} variable', () => {
 			const mockConfig = {
 				relative: '${relativeFile}',
 			};
@@ -301,13 +301,13 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(mockWorkspaceFolder as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				relative: 'src/utils/helper.ts',
 			});
 		});
 
-		it('should substitute ${relativeFileDirname} variable', async () => {
+		it('should substitute ${relativeFileDirname} variable', () => {
 			const mockConfig = {
 				dir: '${relativeFileDirname}',
 			};
@@ -332,13 +332,13 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(mockWorkspaceFolder as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				dir: 'src/utils',
 			});
 		});
 
-		it('should substitute ${fileBasename} variable', async () => {
+		it('should substitute ${fileBasename} variable', () => {
 			const mockConfig = {
 				basename: '${fileBasename}',
 			};
@@ -354,13 +354,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				basename: 'index.ts',
 			});
 		});
 
-		it('should substitute ${fileBasenameNoExtension} variable', async () => {
+		it('should substitute ${fileBasenameNoExtension} variable', () => {
 			const mockConfig = {
 				name: '${fileBasenameNoExtension}',
 			};
@@ -376,13 +376,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				name: 'index',
 			});
 		});
 
-		it('should substitute ${fileDirname} variable', async () => {
+		it('should substitute ${fileDirname} variable', () => {
 			const mockConfig = {
 				dirname: '${fileDirname}',
 			};
@@ -398,13 +398,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				dirname: '/workspace/project/src/utils',
 			});
 		});
 
-		it('should substitute ${fileExtname} variable', async () => {
+		it('should substitute ${fileExtname} variable', () => {
 			const mockConfig = {
 				ext: '${fileExtname}',
 			};
@@ -420,7 +420,7 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				ext: '.ts',
 			});
@@ -432,7 +432,7 @@ describe('getConfig', () => {
 			if (clearCacheCallback) clearCacheCallback();
 		});
 
-		it('should substitute ${lineNumber} variable', async () => {
+		it('should substitute ${lineNumber} variable', () => {
 			const mockConfig = {
 				line: '${lineNumber}',
 			};
@@ -453,13 +453,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				line: '43',
 			});
 		});
 
-		it('should substitute ${selectedText} variable with single selection', async () => {
+		it('should substitute ${selectedText} variable with single selection', () => {
 			const mockConfig = {
 				text: '${selectedText}',
 			};
@@ -482,13 +482,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				text: 'selected text',
 			});
 		});
 
-		it('should handle empty selection for ${selectedText}', async () => {
+		it('should handle empty selection for ${selectedText}', () => {
 			const mockConfig = {
 				text: '${selectedText}',
 			};
@@ -511,13 +511,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				text: '${selectedText}',
 			});
 		});
 
-		it('should handle multiple selections for ${selectedText}', async () => {
+		it('should handle multiple selections for ${selectedText}', () => {
 			const mockConfig = {
 				text: '${selectedText}',
 			};
@@ -544,7 +544,7 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				text: 'first,second',
 			});
@@ -552,46 +552,46 @@ describe('getConfig', () => {
 	});
 
 	describe('variable substitution - system', () => {
-		it('should substitute ${cwd} variable', async () => {
+		it('should substitute ${cwd} variable', () => {
 			const mockConfig = {
 				workingDir: '${cwd}',
 			};
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				workingDir: process.cwd(),
 			});
 		});
 
-		it('should substitute ${execPath} variable', async () => {
+		it('should substitute ${execPath} variable', () => {
 			const mockConfig = {
 				exec: '${execPath}',
 			};
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				exec: process.execPath,
 			});
 		});
 
-		it('should substitute ${pathSeparator} variable', async () => {
+		it('should substitute ${pathSeparator} variable', () => {
 			const mockConfig = {
 				sep: '${pathSeparator}',
 			};
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				sep: process.platform === 'win32' ? '\\' : '/',
 			});
 		});
 
-		it('should substitute ${env:VAR} variable', async () => {
+		it('should substitute ${env:VAR} variable', () => {
 			const mockConfig = {
 				home: '${env:HOME}',
 			};
@@ -599,13 +599,13 @@ describe('getConfig', () => {
 			process.env.HOME = '/home/user';
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				home: '/home/user',
 			});
 		});
 
-		it('should not substitute ${env:VAR} when variable does not exist', async () => {
+		it('should not substitute ${env:VAR} when variable does not exist', () => {
 			const mockConfig = {
 				nonexistent: '${env:NONEXISTENT_VAR}',
 			};
@@ -613,13 +613,13 @@ describe('getConfig', () => {
 			delete process.env.NONEXISTENT_VAR;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				nonexistent: '${env:NONEXISTENT_VAR}',
 			});
 		});
 
-		it('should substitute ${config:VAR} variable', async () => {
+		it('should substitute ${config:VAR} variable', () => {
 			const mockConfig = {
 				fontSize: '${config:editor.fontSize}',
 				editor: {
@@ -629,7 +629,7 @@ describe('getConfig', () => {
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				fontSize: '16',
 				editor: {
@@ -638,14 +638,14 @@ describe('getConfig', () => {
 			});
 		});
 
-		it('should not substitute ${config:VAR} when config does not exist', async () => {
+		it('should not substitute ${config:VAR} when config does not exist', () => {
 			const mockConfig = {
 				value: '${config:nonexistent.setting}',
 			};
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				value: '${config:nonexistent.setting}',
 			});
@@ -657,7 +657,7 @@ describe('getConfig', () => {
 			if (clearCacheCallback) clearCacheCallback();
 		});
 
-		it('should handle no active editor gracefully for ${file}', async () => {
+		it('should handle no active editor gracefully for ${file}', () => {
 			const mockConfig = {
 				path: '${file}',
 			};
@@ -665,14 +665,14 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = undefined;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '${file}',
 			});
 			expect(vscode.window.showWarningMessage).toHaveBeenCalledWith('No open editors');
 		});
 
-		it('should handle no workspace folder gracefully', async () => {
+		it('should handle no workspace folder gracefully', () => {
 			const mockConfig = {
 				path: '${workspaceFolder}',
 			};
@@ -689,14 +689,14 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(undefined);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '${workspaceFolder}',
 			});
 			expect(vscode.window.showWarningMessage).toHaveBeenCalledWith('No open workspaces');
 		});
 
-		it('should handle complex nested config with multiple substitutions', async () => {
+		it('should handle complex nested config with multiple substitutions', () => {
 			const mockConfig = {
 				paths: {
 					workspace: '${workspaceFolder}',
@@ -729,7 +729,7 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(mockWorkspaceFolder as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				paths: {
 					workspace: '/workspace/project',
@@ -743,20 +743,20 @@ describe('getConfig', () => {
 			});
 		});
 
-		it('should handle array values with variable substitutions', async () => {
+		it('should handle array values with variable substitutions', () => {
 			const mockConfig = {
 				items: ['${cwd}/src', '${cwd}/tests', '${cwd}/dist'],
 			};
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				items: [`${process.cwd()}/src`, `${process.cwd()}/tests`, `${process.cwd()}/dist`],
 			});
 		});
 
-		it('should skip variable substitution when pattern not present', async () => {
+		it('should skip variable substitution when pattern not present', () => {
 			const mockConfig = {
 				simple: 'value',
 				number: 42,
@@ -765,7 +765,7 @@ describe('getConfig', () => {
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				simple: 'value',
 				number: 42,
@@ -773,7 +773,7 @@ describe('getConfig', () => {
 			});
 		});
 
-		it('should handle workspace folder with empty fsPath', async () => {
+		it('should handle workspace folder with empty fsPath', () => {
 			const mockConfig = {
 				path: '${workspaceFolder}',
 			};
@@ -798,24 +798,24 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(mockWorkspaceFolder as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '${workspaceFolder}',
 			});
 		});
 
-		it('should handle undefined config notation with empty string', async () => {
+		it('should handle undefined config notation with empty string', () => {
 			const mockConfig = {
 				test: 'value',
 			};
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig('');
+			const result = getConfig('');
 			expect(result).toEqual(mockConfig);
 		});
 
-		it('should substitute same variable multiple times', async () => {
+		it('should substitute same variable multiple times', () => {
 			const mockConfig = {
 				path1: '${cwd}/src',
 				path2: '${cwd}/tests',
@@ -824,7 +824,7 @@ describe('getConfig', () => {
 
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			const cwd = process.cwd();
 			expect(result).toEqual({
 				path1: `${cwd}/src`,
@@ -833,7 +833,7 @@ describe('getConfig', () => {
 			});
 		});
 
-		it('should handle invalid line numbers', async () => {
+		it('should handle invalid line numbers', () => {
 			const mockConfig = {
 				line: '${lineNumber}',
 			};
@@ -854,14 +854,14 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			// Line number 0 (from -1 + 1) is invalid and should not be substituted
 			expect(result).toEqual({
 				line: '${lineNumber}',
 			});
 		});
 
-		it('should handle file without extension', async () => {
+		it('should handle file without extension', () => {
 			const mockConfig = {
 				name: '${fileBasenameNoExtension}',
 				ext: '${fileExtname}',
@@ -878,14 +878,14 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				name: 'Makefile',
 				ext: '',
 			});
 		});
 
-		it('should not substitute variables when no workspace folders', async () => {
+		it('should not substitute variables when no workspace folders', () => {
 			const mockConfig = {
 				path: '${workspaceFolder:myproject}/api',
 			};
@@ -893,7 +893,7 @@ describe('getConfig', () => {
 			(vscode.workspace as any).workspaceFolders = undefined;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				path: '${workspaceFolder:myproject}/api',
 			});
@@ -905,7 +905,7 @@ describe('getConfig', () => {
 			if (clearCacheCallback) clearCacheCallback();
 		});
 
-		it('should cache file-based values for performance', async () => {
+		it('should cache file-based values for performance', () => {
 			const mockConfig = {
 				file1: '${file}',
 				file2: '${file}',
@@ -922,7 +922,7 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = mockEditor;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				file1: '/workspace/project/file.ts',
 				file2: '/workspace/project/file.ts',
@@ -935,7 +935,7 @@ describe('getConfig', () => {
 			if (clearCacheCallback) clearCacheCallback();
 		});
 
-		it('should handle ${lineNumber} without editor', async () => {
+		it('should handle ${lineNumber} without editor', () => {
 			const mockConfig = {
 				line: '${lineNumber}',
 			};
@@ -943,13 +943,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = undefined;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				line: '${lineNumber}',
 			});
 		});
 
-		it('should handle ${selectedText} without editor', async () => {
+		it('should handle ${selectedText} without editor', () => {
 			const mockConfig = {
 				text: '${selectedText}',
 			};
@@ -957,13 +957,13 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = undefined;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				text: '${selectedText}',
 			});
 		});
 
-		it('should handle ${relativeFile} when no workspace folder exists', async () => {
+		it('should handle ${relativeFile} when no workspace folder exists', () => {
 			const mockConfig = {
 				relative: '${relativeFile}',
 			};
@@ -980,13 +980,13 @@ describe('getConfig', () => {
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(undefined);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				relative: '${relativeFile}',
 			});
 		});
 
-		it('should handle ${relativeFile} when no file exists', async () => {
+		it('should handle ${relativeFile} when no file exists', () => {
 			const mockConfig = {
 				relative: '${relativeFile}',
 			};
@@ -994,7 +994,7 @@ describe('getConfig', () => {
 			(vscode.window as any).activeTextEditor = undefined;
 			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
 
-			const result = await getConfig();
+			const result = getConfig();
 			expect(result).toEqual({
 				relative: '${relativeFile}',
 			});
