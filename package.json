@@ -13,7 +13,7 @@
 		"prepack": "npm run build",
 		"prepare": "lefthook install",
 		"publish:npm": "np --package-manager pnpm --any-branch",
-		"test": "vitest",
+		"test": "vitest run",
 		"test:coverage": "vitest --coverage"
 	},
 	"type": "module",
