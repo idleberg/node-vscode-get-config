@@ -56,17 +56,15 @@ vscode.window.onDidChangeActiveTextEditor(() => {
 	cache.clear();
 });
 
-export async function getConfig<T = vscode.WorkspaceConfiguration | typeof dotProp.getProperty>(
-	configNotation?: string,
-): Promise<T> {
+export function getConfig<T = vscode.WorkspaceConfiguration | typeof dotProp.getProperty>(configNotation?: string): T {
 	const config = configNotation?.length
 		? dotProp.getProperty(vscode.workspace.getConfiguration(), configNotation)
 		: vscode.workspace.getConfiguration();
 
-	return config && Object.keys(config).length ? ((await substituteVariables(config)) as T) : (config as T);
+	return config && Object.keys(config).length ? (substituteVariables(config) as T) : (config as T);
 }
 
-async function substituteVariables(config: vscode.WorkspaceConfiguration): Promise<unknown> {
+function substituteVariables(config: vscode.WorkspaceConfiguration): unknown {
 	let configString = JSON.stringify(config);
 
 	// Define all variable replacements with their resolvers
