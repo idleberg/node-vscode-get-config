@@ -28,7 +28,7 @@ getConfig(section?: string)
 ```js
 import { getConfig } from 'vscode-get-config';
 
-const { fontFamily, fontSize } = await getConfig('editor');
+const { fontFamily, fontSize } = getConfig('editor');
 ```
 
 ### Variable Substitution
