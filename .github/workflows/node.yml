@@ -62,7 +62,7 @@ jobs:
         run: pnpm run --if-present build
 
       - name: Lint Source
-        run: pnpm run --if-present lint
+        run: pnpm exec biome ci
 
       - name: Run Tests
         run: pnpm run --if-present test
