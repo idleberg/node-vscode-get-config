@@ -1,6 +1,6 @@
 {
 	"name": "vscode-get-config",
-	"version": "0.6.0",
+	"version": "0.6.1",
 	"description": "A simple wrapper for `vscode.workspace.getConfiguration()` provided by the Visual Studio Code API",
 	"license": "MIT",
 	"scripts": {
