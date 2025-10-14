@@ -56,7 +56,7 @@ vscode.window.onDidChangeActiveTextEditor(() => {
 	cache.clear();
 });
 
-export function getConfig<T = vscode.WorkspaceConfiguration | typeof dotProp.getProperty>(configNotation?: string): T {
+export function getConfig<T = vscode.WorkspaceConfiguration>(configNotation?: string): T {
 	const config = configNotation?.length
 		? dotProp.getProperty(vscode.workspace.getConfiguration(), configNotation)
 		: vscode.workspace.getConfiguration();
