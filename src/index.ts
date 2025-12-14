@@ -1,5 +1,5 @@
 import { basename, dirname, extname, join, relative, sep } from 'node:path';
-import * as dotProp from 'dot-prop';
+import delve from 'dlv';
 import * as vscode from 'vscode';
 
 // Pre-compiled regex patterns for better performance
@@ -58,7 +58,7 @@ vscode.window.onDidChangeActiveTextEditor(() => {
 
 export function getConfig<T = vscode.WorkspaceConfiguration>(configNotation?: string): T {
 	const config = configNotation?.length
-		? dotProp.getProperty(vscode.workspace.getConfiguration(), configNotation)
+		? delve(vscode.workspace.getConfiguration(), configNotation)
 		: vscode.workspace.getConfiguration();
 
 	return config && Object.keys(config).length ? (substituteVariables(config) as T) : (config as T);
@@ -243,7 +243,7 @@ function replaceConfigVariables(configString: string): string {
 	const nameMatch = match[0].match(/\${config:(?<name>[^}]+)}/);
 	if (nameMatch?.groups?.name) {
 		const configuration = vscode.workspace.getConfiguration();
-		const value = dotProp.getProperty(configuration, nameMatch.groups.name);
+		const value = delve(configuration, nameMatch.groups.name);
 		if (value !== undefined) {
 			return configString.replace(REGEX_PATTERNS.config, String(value));
 		}
