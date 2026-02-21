@@ -217,6 +217,63 @@ describe('getConfig', () => {
 			});
 		});
 
+		it('should substitute ${workspaceFolder} via fallback when no active editor', () => {
+			const mockConfig = {
+				path: '${workspaceFolder}/src',
+			};
+
+			const mockWorkspaceFolders = [
+				{
+					uri: { fsPath: '/workspace/project' },
+					name: 'project',
+					index: 0,
+				},
+			];
+
+			(vscode.window as any).activeTextEditor = undefined;
+			(vscode.workspace as any).workspaceFolders = mockWorkspaceFolders;
+			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
+
+			const result = getConfig();
+			expect(result).toEqual({
+				path: '/workspace/project/src',
+			});
+			expect(vscode.window.showWarningMessage).not.toHaveBeenCalledWith('No open workspaces');
+		});
+
+		it('should substitute ${workspaceFolder} via fallback when file is outside workspace', () => {
+			const mockConfig = {
+				path: '${workspaceFolder}/src',
+			};
+
+			const mockEditor = {
+				document: {
+					uri: {
+						fsPath: '/tmp/outside-file.ts',
+					},
+				},
+			};
+
+			const mockWorkspaceFolders = [
+				{
+					uri: { fsPath: '/workspace/project' },
+					name: 'project',
+					index: 0,
+				},
+			];
+
+			(vscode.window as any).activeTextEditor = mockEditor;
+			(vscode.workspace as any).workspaceFolders = mockWorkspaceFolders;
+			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
+			vi.mocked(vscode.workspace.getWorkspaceFolder).mockReturnValue(undefined);
+
+			const result = getConfig();
+			expect(result).toEqual({
+				path: '/workspace/project/src',
+			});
+			expect(vscode.window.showWarningMessage).not.toHaveBeenCalledWith('No open workspaces');
+		});
+
 		it('should handle multiple named workspace folder substitutions', () => {
 			const mockConfig = {
 				paths: [
@@ -605,6 +662,25 @@ describe('getConfig', () => {
 			});
 		});
 
+		it('should substitute multiple different ${env:VAR} variables', () => {
+			const mockConfig = {
+				home: '${env:HOME}',
+				user: '${env:USER}',
+				combined: '${env:HOME}/${env:USER}',
+			};
+
+			process.env.HOME = '/home/user';
+			process.env.USER = 'testuser';
+			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
+
+			const result = getConfig();
+			expect(result).toEqual({
+				home: '/home/user',
+				user: 'testuser',
+				combined: '/home/user/testuser',
+			});
+		});
+
 		it('should not substitute ${env:VAR} when variable does not exist', () => {
 			const mockConfig = {
 				nonexistent: '${env:NONEXISTENT_VAR}',
@@ -634,6 +710,29 @@ describe('getConfig', () => {
 				fontSize: '16',
 				editor: {
 					fontSize: 16,
+				},
+			});
+		});
+
+		it('should substitute multiple different ${config:VAR} variables', () => {
+			const mockConfig = {
+				fontSize: '${config:editor.fontSize}',
+				tabSize: '${config:editor.tabSize}',
+				editor: {
+					fontSize: 16,
+					tabSize: 4,
+				},
+			};
+
+			vi.mocked(vscode.workspace.getConfiguration).mockReturnValue(mockConfig as any);
+
+			const result = getConfig();
+			expect(result).toEqual({
+				fontSize: '16',
+				tabSize: '4',
+				editor: {
+					fontSize: 16,
+					tabSize: 4,
 				},
 			});
 		});

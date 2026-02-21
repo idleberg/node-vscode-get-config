@@ -1,4 +1,4 @@
-import { basename, dirname, extname, join, relative, sep } from 'node:path';
+import { basename, dirname, extname, relative, sep } from 'node:path';
 import delve from 'dlv';
 import * as vscode from 'vscode';
 
@@ -222,34 +222,50 @@ function replaceNamedWorkspaceFolders(configString: string): string {
 }
 
 function replaceEnvironmentVariables(configString: string): string {
-	const match = configString.match(REGEX_PATTERNS.env);
-	if (!match?.[0]) return configString;
+	const matches = configString.match(REGEX_PATTERNS.env);
+	if (!matches?.length) return configString;
 
-	const nameMatch = match[0].match(/\${env:(?<name>[^}]+)}/);
-	if (nameMatch?.groups?.name) {
-		const envValue = process.env[nameMatch.groups.name];
-		if (envValue) {
-			return configString.replace(REGEX_PATTERNS.env, envValue);
+	let result = configString;
+	const processed = new Set<string>();
+
+	for (const match of matches) {
+		if (processed.has(match)) continue;
+		processed.add(match);
+
+		const nameMatch = match.match(/\${env:(?<name>[^}]+)}/);
+		if (nameMatch?.groups?.name) {
+			const envValue = process.env[nameMatch.groups.name];
+			if (envValue) {
+				result = result.replaceAll(match, envValue);
+			}
 		}
 	}
 
-	return configString;
+	return result;
 }
 
 function replaceConfigVariables(configString: string): string {
-	const match = configString.match(REGEX_PATTERNS.config);
-	if (!match?.[0]) return configString;
+	const matches = configString.match(REGEX_PATTERNS.config);
+	if (!matches?.length) return configString;
 
-	const nameMatch = match[0].match(/\${config:(?<name>[^}]+)}/);
-	if (nameMatch?.groups?.name) {
-		const configuration = vscode.workspace.getConfiguration();
-		const value = delve(configuration, nameMatch.groups.name);
-		if (value !== undefined) {
-			return configString.replace(REGEX_PATTERNS.config, String(value));
+	let result = configString;
+	const configuration = vscode.workspace.getConfiguration();
+	const processed = new Set<string>();
+
+	for (const match of matches) {
+		if (processed.has(match)) continue;
+		processed.add(match);
+
+		const nameMatch = match.match(/\${config:(?<name>[^}]+)}/);
+		if (nameMatch?.groups?.name) {
+			const value = delve(configuration, nameMatch.groups.name);
+			if (value !== undefined) {
+				result = result.replaceAll(match, String(value));
+			}
 		}
 	}
 
-	return configString;
+	return result;
 }
 
 function getFile(): string | undefined {
@@ -263,21 +279,24 @@ function getFile(): string | undefined {
 	});
 }
 
-function getWorkspaceFolder(appendPath = ''): string | undefined {
-	return getCached(`workspaceFolder:${appendPath}`, () => {
+function getWorkspaceFolder(): string | undefined {
+	return getCached('workspaceFolder', () => {
 		const editor = vscode.window.activeTextEditor;
-		if (!editor) {
-			vscode.window.showWarningMessage('No open editors');
-			return undefined;
+		if (editor) {
+			const workspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
+			if (workspaceFolder?.uri.fsPath?.length) {
+				return workspaceFolder.uri.fsPath;
+			}
 		}
 
-		const workspaceFolder = vscode.workspace.getWorkspaceFolder(editor.document.uri);
-		if (!workspaceFolder?.uri.fsPath?.length) {
-			vscode.window.showWarningMessage('No open workspaces');
-			return undefined;
+		// Fallback: use first workspace folder
+		const firstFolder = vscode.workspace.workspaceFolders?.[0];
+		if (firstFolder?.uri.fsPath?.length) {
+			return firstFolder.uri.fsPath;
 		}
 
-		return appendPath?.length ? join(workspaceFolder.uri.fsPath, appendPath) : workspaceFolder.uri.fsPath;
+		vscode.window.showWarningMessage('No open workspaces');
+		return undefined;
 	});
 }
 
